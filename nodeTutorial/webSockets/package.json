@@ -1,0 +1,17 @@
+{
+  "name": "ok",
+  "version": "1.0.0",
+  "description": "",
+  "main": "./",
+  "dependencies": {
+    "JSON": "^1.0.0",
+    "express": "^4.15.2",
+    "ws": "^2.2.2"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "ok"
+  },
+  "author": "",
+  "license": "ISC"
+}
