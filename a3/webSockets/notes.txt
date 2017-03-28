@@ -1,0 +1,35 @@
+# On lab systems ...
+# Setup for the files here
+
+npm init
+# npm init creates a package.json
+# http://browsenpm.org/package.json
+# https://docs.npmjs.com/files/package.json
+
+# We are adding the ws libraries, they will be in our local node_modules
+npm install --save express
+npm install --save ws
+npm install --save JSON
+
+# check out the package.json now
+# check out node_modules
+
+# We are adding the ws libraries, they will be in our local node_modules
+
+# use this one to get the static content
+nodejs express-static.js & # run this one in the background
+
+# try this one first...
+nodejs echoServerSimple.js
+# http://localhost:8000/echoClient.html
+# Explain why this works!! That is, why you get the html and jquery.js
+# Open another browser window, are the messages broadcast?
+# Take a look at the echoServerSimple.js and explain what it is doing.
+
+# next try this one...
+nodejs echoServerBroadcast.js
+# http://localhost:8000/echoClient.html
+# Open another browser window, are the messages broadcast?
+# Take a look at the echoServerBroadcast.js and explain what it is doing.
+
+# Finally, try the scribble app with the above two servers.

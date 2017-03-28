@@ -1,0 +1,294 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+        <meta HTTP-EQUIV="EXPIRES" CONTENT="-1">
+        <title>Computing Science 309 Warehouse Wars</title>
+        <script language="javascript" src="jquery-3.1.1.min.js" > </script>
+        <script language="javascript" src="ww.js" ></script>
+        <script language="javascript" src="new.js"></script> 
+
+        <script> 
+
+            stage=null;
+            // SOME GLUE CODE CONNECTING THIS PAGE TO THE STAGE
+            interval=null;
+            function setupGame(go){
+                stage=new Stage(20,20,"stage");
+                stage.initialize();
+            }
+            function startGame(){
+                // YOUR CODE GOES HERE
+                var startime = new Date();
+                document.onkeydown = function(e){
+                    stage.keysaction(e);
+                }
+                var interval = setInterval(function(){
+                    var keepgoing = stage.step();
+                    display(startime);
+                    if(!keepgoing){
+                        setScore();
+                        clearInterval(interval);
+                        document.onkeydown = function(e){}
+                        clearInterval(display(startime)); 
+                    }
+
+                },2000);
+                
+            }
+            function pauseGame(){
+                // YOUR CODE GOES HERE
+            }
+            // YOUR CODE GOES HERE
+
+            $(function(){
+                //setupGame();
+                //startGame();
+                setScores();
+                toggleLogin(setupGame,startGame);
+            });
+
+
+        </script>
+    </head>
+  
+    <body>
+        <style>
+            body{
+                background-color:beige;
+                font-family: Arial;
+            }
+            form {
+                background-color: #FFDEAD;
+                width:25%;
+                border: 3px solid #f1f1f1;
+                border-left: 2px;
+            }
+
+            input[type=text], input[type=password] {
+                width: 70%;
+                padding: 12px 20px;
+                margin: 8px 0;
+                display: inline-block;
+                border: 1px solid #ccc;
+                box-sizing: border-box;
+            }
+
+            button {
+                background-color: lightblue;
+                padding: 14px 20px;
+                margin: 8px 0;
+                border: none;
+                cursor: pointer;
+                width: 45%;
+            }
+
+            table, td, th {
+                border: 1px solid black;
+            }
+
+            table.highscores {
+                border-collapse: collapse;
+                width: 50%;
+                margin-top:-210px;
+                margin-left:400px;
+            }
+
+            table.highscores th {
+                background-color: lightblue;
+                height: 50px;
+            }
+            
+            table.highscores td {
+                text-align:center; 
+            }
+
+        </style>
+        <!-- Login form-->
+        <div name="login" id="login" style="display:">
+            <h2>Login Form</h2>
+            <form method="post" name="logForm">
+                <label><b>Username</b></label>
+                <input type="text" id = "uname" placeholder="Enter Username" name="uname"/>
+                <br/><br/>
+                <label><b>Password</b></label>
+                <input type="password" id = "psw" placeholder="Enter Password" name="psw"/> 
+                <br/><br/>          
+                <button type="submit" id='log' name="submit">Login</button>  
+                <button type="button" id='reg' name="submit">Register</button>
+            </form>
+            <div style="position: absolute; left: 700px; top: 0px; width: 200px; height: 60px;">
+                <h2><label class="scoresLabel">Highscores</label></h2>
+            </div>
+            <table id="highscores" class="highscores">
+                <tr>
+                    <th>Username</th>
+                    <th>Score</th>
+                </tr>
+            </table>
+        </div>
+
+        <!-- Registration form-->
+        <div name="register" id="register" style="display:none">
+            <h2>Registration Form</h2>
+            <form method="post" name="regForm">
+                <label><b>First Name</b></label>
+                <input type="text" pattern="[a-zA-Z0-9]+" id="fnameREG" placeholder="First Name" name="fname" required/> 
+                <br/><br/>
+                <label><b>Last Name</b></label>
+                <input type="text" pattern="[a-zA-Z0-9]+" id ="lnameREG" placeholder="Last Name" name="lname" required/> 
+                <br/><br/>
+                <label><b>Username</b></label>
+                <input type="text" pattern="[a-zA-Z0-9]+" id = "usernameREG" placeholder="Enter Username" name="regUname" required/>
+                <br/><br/>
+                <label><b>Password</b></label>
+                <input type="password" pattern="[a-zA-Z0-9]+" id = "passwdREG" placeholder="Enter Password" name="regPsw" required/> 
+                <br/><br/>
+                <label><b>Email</b></label>
+                <input type="email" id = "emailREG" placeholder="Enter Email" name="email" required/> 
+                <br/><br/>        
+                <button type="button" id='backLog' name="submit">Back</button>  
+                <button type="submit" id='toGame' name="submit">Next</button>
+                
+            </form>
+        </div>
+
+        <!-- Account modification form-->
+        <div name="prof" id="prof" style="display:none">
+            <h2>Profile Form</h2>
+            <form method="post" name="proForm">
+                <label><b>First Name</b></label>
+                <br>
+                <input type="text" pattern="[a-zA-Z0-9]+" id="mfname" placeholder="First Name" name="mfname" /> 
+                <br>
+                <label><b>Last Name</b></label>
+                <br>
+                <input type="text" pattern="[a-zA-Z0-9]+" id ="mlname" placeholder="Last Name" name="mlname" /> 
+                <br/>
+                <label><b>Old Password</b></label>
+                <input type="password" pattern="[a-zA-Z0-9]+" id = "oldPasswd" placeholder="Enter Password" name="regPsw" /> 
+                <br/>
+                <label><b>New Password</b></label>
+                <input type="password" pattern="[a-zA-Z0-9]+" id = "newPasswd" placeholder="Enter Password" name="regPsw" /> 
+                <br/>
+                <label><b>Email</b></label>
+                <br>
+                <input type="email" id = "memail" placeholder="Enter Email" name="memail" /> 
+                <br/><br/>        
+                <button type="button" id='backGame' name="submit">Back</button>  
+                <button type="submit" id='toGame2' name="submit">Next</button>
+                
+            </form>
+        </div>
+
+        <div id="game" style="display:none">
+            <style>
+                /* style parts of the legend, the controls and the elements in the stage appropriately */
+                .table {
+                    border: 1px solid black;
+                    table-layout: fixed;
+                    width: 200px;
+                    padding:0; 
+                    margin:0;
+                    border-collapse: collapse
+
+
+                }
+
+                .game {
+                    width:20px; 
+                    height:20px;
+                    max-width:5px;
+                    max-height:5px; 
+                    padding:0; 
+                    margin:0;
+                    text-align: center;
+                    border: 1px solid black;
+                    margin-left: auto;
+                    margin-right: auto;
+                    border-collapse: collapse;
+                    **overflow:hidden;** /*(Optional)This might be useful for some overflow contents*/   
+                }
+                .autosize {
+                    max-width: 100%;
+                    height: auto;
+                    width: auto;
+                }
+                button.profile {
+                    top : 25px;
+                    position: relative;;
+                }
+                #game button{
+                    margin: 5px;
+                }
+            </style>
+            <body bgcolor="ffffff">
+                <div style="position: absolute; left: 25px; top: 75px; width: 20%;">
+                    <h2><label id='welcomeLog'></label></h2>
+                    <button type="submit" id='profile' name="submit">Account Modification</button>
+                    <br>
+                    <button type="submit" id='logout' name="submit">Logout</button>
+                    <br></br>
+                    <h2><label id="cha">Challenge:</label></h2>
+                    <label><b>Enter Username to Challenge:</b></label>
+                    <input type="text" id ="chal" placeholder="Username" name="chal" /> 
+                    <button type="submit" id='sendChal' name="sendChal">Challenge</button>
+                </div>
+                <div id="rightSide" class="rightSide" style="position: absolute; right: 10px; top: 80px; width: 20%;">
+                    <b><label id="score"></label><b>
+                    <h2><label id="req">Requests:</label></h2>
+
+                </div>
+                <center>
+                    <h1>Warehouse Wars</h1>
+                    <table>
+                        <tr>
+                            <td> <div id="stage"> </div></td> 
+                            <td>
+                                <center>
+                                    <h2>Legend</h2>
+                                    <table class="legend">
+                                        <tr>
+                                            <td> <img src="icons/blank.gif" id="blankImage" /> </td>
+                                            <td> <img src="icons/emblem-package-2-24.png" id="boxImage" /> </td>
+                                            <td> <img src="icons/face-cool-24.png" id="playerImage" /> </td>
+                                            <td> <img src="icons/face-devil-grin-24.png" id="monsterImage" /> </td>
+                                            <td> <img src="icons/wall.jpeg" id="wallImage" /> </td>
+                                        </tr>
+                                        <tr>
+                                            <td> Empty <br/> Square </td>
+                                            <td> Box </td>
+                                            <td> Player </td>
+                                            <td> Monster </td>
+                                            <td> Wall </td>
+                                        </tr>
+                                    </table>
+                                    <h2>Controls</h2>
+                                    <table class="controls">
+                                        <tr>
+                                            <td><img src="icons/north_west.svg"  onclick = "stage.playeraction('NW')" /></td>
+                                            <td><a class="up"><img src="icons/north.svg" onclick = "stage.playeraction('N')" ></td>
+                                            <td><img src="icons/north_east.svg"  onclick = "stage.playeraction('NE')" /></td>
+                                        </tr>
+                                        <tr>
+                                            <td><a class="left"><img src="icons/west.svg"  onclick = "stage.playeraction('W')" /></td>
+                                            <td>&nbsp;</td>
+                                            <td><a class="right"><img src="icons/east.svg "   onclick = "stage.playeraction('E')"/></td>
+                                        </tr>
+                                        <tr>
+                                            <td><img src="icons/south_west.svg"  onclick = "stage.playeraction('SW')"/></td>
+                                            <td><a class="down"><img src="icons/south.svg"  onclick = "stage.playeraction('S')" /></td>
+                                            <td><img src="icons/south_east.svg"  onclick = "stage.playeraction('SE')" /></td>
+                                        </tr>
+                                    </table>
+                                </center>
+                            </td>
+                        </tr>
+                    </table>
+                </center>
+            </body>
+        </div>
+    </body>
+</html>
+
+
