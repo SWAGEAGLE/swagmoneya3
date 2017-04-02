@@ -1,5 +1,5 @@
 var WebSocketServer = require('ws').Server
-   ,wss = new WebSocketServer({port: 10434});
+   ,wss = new WebSocketServer({port: 10431});
 
 var messages=[];
 
@@ -19,13 +19,13 @@ wss.broadcast = function(message){
 wss.on('connection', function(ws) {
 	var i;
 	for(i=0;i<messages.length;i++){
-//		ws.send(messages[i]);
+		ws.send(messages[i]);
 	}
 	ws.on('message', function(message) {
         console.log('yo')
-//		console.log(message);
-	//	 ws.send(message); 
-//		wss.broadcast(message);
-//		messages.push(message);
+		console.log(message);
+		//ws.send(message); 
+		wss.broadcast(message);
+		messages.push(message);
 	});
 });

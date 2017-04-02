@@ -12,8 +12,8 @@
 			}
 			
 			$(function(){
-				// socket = new WebSocket("ws://cslinux.utm.utoronto.ca:10000");
-				socket = new WebSocket("ws://localhost:10000");
+				 socket = new WebSocket("ws://cslinux.utm.utoronto.ca:10431");
+				//socket = new WebSocket("ws://localhost:10000");
 				socket.onopen = function (event) {
 					$('#sendButton').removeAttr('disabled');
 					console.log("connected");
