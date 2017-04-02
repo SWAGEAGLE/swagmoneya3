@@ -428,6 +428,7 @@ gameworld.server.on('close', function() {
 */
 server.on('connection', function(ws){
     console.log('new player request');
+    var user;
     ws.on('message',function(message){
         //console.log('did we make it');
         var parsed = JSON.parse(message);
@@ -435,6 +436,7 @@ server.on('connection', function(ws){
         if(parsed.new != null){
             console.log("in parsed: "+parsed.username);
             gameworld.stage.addPlayer(parsed.username);
+            user=parsed.username;
             ws.send(JSON.stringify({actors: gameworld.stage.actors, players: gameworld.stage.players}));
             //console.log('game data sent');
         }else if(parsed.move != null){
@@ -447,6 +449,28 @@ server.on('connection', function(ws){
 
     setInterval(function(){
         gameworld.stage.step();
-        ws.send(JSON.stringify({actors: gameworld.stage.actors, players: gameworld.stage.players}))
+        //ws.send(JSON.stringify({actors: gameworld.stage.actors, players: gameworld.stage.players}))
+        server.broadcast(JSON.stringify({actors: gameworld.stage.actors, players: gameworld.stage.players}));
     },2000)
+
+    ws.on('close', function (event) {
+        for (var i = 0; i < gameworld.stage.actors.length ; i++){
+            if (gameworld.stage.actors[i].username==user){
+                gameworld.stage.actors.splice(i,1);
+            }
+
+        }
+        console.log('disconnected');
+    })
+    
 });
+
+server.broadcast = function(message){
+    for(let ws of this.clients){ 
+        ws.send(message); 
+    }
+
+    // Alternatively
+    // this.clients.forEach(function (ws){ ws.send(message); });
+}
+

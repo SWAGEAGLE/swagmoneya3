@@ -344,9 +344,6 @@ function gameStart(user){
 	        rend.draw();
 	        
 	    }
-	    socket.onclose = function(event) { 	
-	    	console.log('disconnected'); 
-	    };
 	});
 }
 
