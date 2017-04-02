@@ -1,3 +1,4 @@
+window.newS=true;
 function toggleLogin(setup,start){
 	$(document).ready(
     	$('#log').click(function(e){
@@ -5,11 +6,11 @@ function toggleLogin(setup,start){
 	        	e.preventDefault();	
 	        	username = $('#uname').val();
 	        	pass = $('#psw').val();
+	        	score();
 	        	profile(username,pass,setup,start);
 	        	login(username,pass,setup,start);
-	        	//challenge(username);
-	        	//requests(username);
-	        	//logout();
+	        	logout();
+	        	
 			}
 		}))	
 	//FROM THE FROM FRONTPAGE TO REGISTER
@@ -42,29 +43,43 @@ function showHideLog(setup,start){
 	        	//new
 	        	registerRequest(); 
 	            $('#register').hide()
-	           // setup();
-	            //start();
 	            $('#game').show();
 	            profile($('#usernameREG').val(),$('#passwdREG').val(),setup,start);
+	            getUsers();
 	        }
     }))
 }
 
+function getUsers(){
+	$.getJSON("/currentUsers", {},function(data){
+		var i;
+		for (i=0; i<data.length;i++){
+			var new1=document.getElementById('rightSide');
+			new1.innerHTML+='<label><b>&nbsp;- '+data[i].username+'<b></label><br>';
+		}
+	});
+}
 function login(user,pass,setup,start){
 	$.getJSON("/login", {user: user, pass:pass},function(data){
 		try{
-			$('#welcomeLog').text('Welcome, '+data[0].username);	
+			$('#welcomeLog').text('Welcome, '+data[0].username);
 		    $('#login').hide();
 		    gameStart(user);
+		    var params = {
+				type: "POST", 
+				url: "http://cslinux.utm.utoronto.ca:10430/insertCurrentUser", 
+				data: { "username" : data[0].username} 
+			};
+			$.ajax(params);
+		    getUsers();
+
 		    $('#game').show();
-		    
 		}
 		catch(err){
 			alert('Invalid username/password');
 		}
 		
     })
-    .fail(function(jqXHR, textStatus, errorThrown) { alert('Invalid username/password'); })
 
 }
 
@@ -136,15 +151,21 @@ function profValidate(){
 }
 
 function registerRequest(){
-	var params = { 
+	var params = {
 	type: "POST", 
-	url: "http://cslinux.utm.utoronto.ca:10435/insert", 
+	url: "http://cslinux.utm.utoronto.ca:10430/insert", 
 	data: { "fname": $("#fnameREG").val() , "lname" : $("#lnameREG").val(), "username" : $("#usernameREG").val(),
 			"passwd" : $("#passwdREG").val(), "email" : $("#emailREG").val() } 
 	};
 	$.ajax(params);
 	$('#welcomeLog').text('Welcome, '+$("#usernameREG").val());
-	//challenge($("#usernameREG").val());
+	gameStart($("#usernameREG").val());
+	var params2 = {
+				type: "POST", 
+				url: "http://cslinux.utm.utoronto.ca:10430/insertCurrentUser", 
+				data: { "username" : $("#usernameREG").val()} 
+	};
+	$.ajax(params2);
 }
 
 
@@ -154,6 +175,7 @@ function profile(user,pass,setup,start){
         	e.preventDefault();
         	$('#game').hide();
         	$('#prof').show();
+        	console.log("user: "+user+"pass: "+pass);
         	$.getJSON("/login", {user: user, pass:pass},function(data){
 					document.getElementById('oldPasswd').value='';
 					document.getElementById('newPasswd').value='';
@@ -181,17 +203,7 @@ function profile(user,pass,setup,start){
 		        	opass = $('#oldPasswd').val();
 			        npass = $('#newPasswd').val();
 			        email = $('#memail').val();
-		        	if (profUpdate(uname,opass,npass,email)){
-		        		console.log('done');
-		        		/*
-	        			$('#prof').hide();
-        				$('#game').show();
-        				*/
-		        		
-		        	}
-		        	else{
-		        		alert('Recheck form please!');
-		        	}
+			        profUpdate(uname,opass,npass,email, setup, start);
 		        }
     }))
 }
@@ -210,6 +222,7 @@ function display(date){
 
     // get seconds
     seconds = Math.round(timeDiff % 60);
+    console.log("sec "+seconds);
     $("#score").text("SCORE: "+seconds);
     //setTimeout(display(date), 1000);
 }
@@ -230,9 +243,10 @@ function setScore(){
 }
 
 
-function profUpdate(user,oldpasswd,newpasswd,email){
-	$.getJSON("/login", {user: user, pass:pass},function(data){
-		//console.log(data[0]);
+function profUpdate(user,oldpasswd,newpasswd,email,setup,start){
+	var ret;
+	$.getJSON("/login", {user: user, pass:oldpasswd},function(data){
+		console.log(data[0]);
 		try{
 
 			if (oldpasswd==""){alert("Please enter old password"); return false;}
@@ -241,20 +255,24 @@ function profUpdate(user,oldpasswd,newpasswd,email){
 			
 			var params = { 
 				method: "POST", 
-				url: "http://cslinux.utm.utoronto.ca:10435/update", 
+				url: "http://cslinux.utm.utoronto.ca:10430/update", 
 				data: {user: user, newpasswd: newpasswd, email: email}
 			};
-
+			ret=true;
 			$.ajax(params);
-		    return true;
+			profile(username,newpasswd,setup,start);
+		    $('#prof').hide();
+        	$('#game').show();
 		}
 		catch(err){
-			return false;
+			ret=false;
+		}
+		finally{
+			
+			return ret;
 		}
 		
     })
-    .fail(function(jqXHR, textStatus, errorThrown) { return false })
-	
 }
 
 function setUp(width,height){
@@ -326,10 +344,13 @@ function move(){}
 function gameStart(user){
 	console.log('in gameStart');
 	window.us=user;
+
 	/*****CLIENT SOCKET CODE******/
 	$(document).ready(function(){
-	    window.socket = new WebSocket("ws://cslinux.utm.utoronto.ca:10436");
-	    setUp(20,20);
+	    window.socket = new WebSocket("ws://cslinux.utm.utoronto.ca:10431");
+	    if (newS){
+	    	setUp(20,20);
+	    }
 	    window.rend = new Render();
 	    socket.onopen = function (event) {
 	        console.log('connected to game server');
@@ -338,33 +359,56 @@ function gameStart(user){
 	    socket.onmessage = function(event){
 	        var dat = JSON.parse(event.data);
 	        if(dat.actors != null){
-	            console.log('received actors');
+	            //console.log('received actors');
 	            rend.actors = dat.actors;
-	        } else console.log('got nothing man');
+	        } 
+	        if(dat.user != null){
+	        	/*var params = { 
+					method: "POST", 
+					url: "http://cslinux.utm.utoronto.ca:10430/deleteCurrentUser", 
+					data: {username: dat.user}
+				};
+				$.ajax(params);*/
+	        }
 	        rend.draw();
 	        
 	    }
 	});
 }
 
+function logout(){
+	$(document).ready(
+    	$('#logout').click(function(e){
+        	e.preventDefault();
+
+        	$('#game').hide();
+        	$('#login').show();
+        	document.getElementById('uname').value='';
+			document.getElementById('psw').value='';
+			window.newS=false;
+        }))
+}
 
 
-/*
 function setScores(){
-	$.getJSON("api/api.php", {highscores: null},
+	$.getJSON("/highscores", {},
 	function(data){
 		var table = document.getElementById("highscores");
+		console.log(data);
+		console.log(Object.keys(data).length);
 		var i;
 		for (i=0; i<data.length;i++){
+			console.log("element: "+data[i].username);
 		    var row = table.insertRow(i+1);
 		    var cell1 = row.insertCell(0);
 		    var cell2 = row.insertCell(1);
-		    cell1.innerHTML = data[i][0];
-		    cell2.innerHTML = data[i][1];
+		    cell1.innerHTML = data[i].username;
+		    cell2.innerHTML = data[i].score;
 		}
     })
 }
 
+/*
 function challenge(user){
 	$(document).ready(
     	$('#sendChal').click(function(e){

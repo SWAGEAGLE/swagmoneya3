@@ -18,16 +18,18 @@ app.use(bodyParser.urlencoded({ extended: true }));
 // static_files has all of statically returned content
 // https://expressjs.com/en/starter/static-files.html
 app.use('/',express.static('static_files')); // this directory has files to be returned
-app.listen(10435, function () {
+app.listen(10430, function () {
   console.log('Example app listening on port 10433!');
 });
 // perform a clean wipe of the database
 app.get('/new', function(req,res){
 	MongoClient.connect(url, function(err,db){
-		db.collection('appusers').drop();
-		db.collection('scores').drop();
+		db.collection('appusers').remove({});
+		db.collection('scores').remove({});
+		db.collection('currentUsers').remove({});
 		db.createCollection('appusers');
 		db.createCollection('scores');
+		db.createCollection('currentUsers');
 	})
 
 	res.end('ok');
@@ -36,10 +38,9 @@ app.get('/new', function(req,res){
 app.get('/login', function(req,res){
 	user=req.query.user;
 	pass=req.query.pass
-	console.log("in /login: "+user);
 	MongoClient.connect(url, function(err,db){
 		db.collection('appusers').find({username:user, passwd:pass},{username:1,passwd:1, fname:1, lname:1, email:1}).toArray(function (err, docs) {
-	       // db.close();
+	        db.close();
 
 	        if (err) {
 	            console.log('Error');
@@ -54,13 +55,47 @@ app.get('/login', function(req,res){
 	    });
 	})
 });
+
+app.get('/insertScore',function(req,res){
+	var item = {
+	  	_id : "kevinID",
+	    username : "kevin",
+	    score: "100"
+  	};
+
+	MongoClient.connect(url, function(err,db){
+		db.collection('scores').insert(item, function(err, result){
+			console.log('scores insert');
+			console.log(item);
+		});
+
+	});
+});
+app.get('/highscores',function(req,res){
+
+	MongoClient.connect(url, function(err,db){
+		db.collection('scores').find({}).sort({score:1}).toArray(function (err, docs) {
+	        if (err) {
+	            console.log('Error');
+	            console.log(err);
+	            res.end();
+	        }
+	        else {
+	            console.log('Success');
+	            console.log(docs);
+	           	res.json(docs);
+	        }
+
+	        db.close();
+	    });
+	})
+});
 app.post('/register', function(req,res){
 	console.log('register');
 
 });
 // for now, the login submit button triggers this
 app.post('/insert', function(req, res, next) {
-	console.log('hi');
 	var item = {
 	  	_id : req.body.username,
 	    fname: req.body.fname ,
@@ -81,6 +116,49 @@ app.post('/insert', function(req, res, next) {
 
 });
 
+app.get('/currentUsers',function(req,res){
+
+	MongoClient.connect(url, function(err,db){
+		db.collection('currentUsers').find({}).toArray(function (err, docs) {
+			if (err) {
+	            console.log('Error');
+	            console.log(err);
+	            res.end();
+	        }
+	        else {
+	            console.log('Success');
+	            console.log(docs);
+	           	res.json(docs);
+	        }
+
+	        db.close();
+
+		});
+	});
+});
+app.post('/deleteCurrentUser', function(req, res, next) {
+	MongoClient.connect(url, function(err, db) {
+	    db.collection('currentUsers').remove({ username: req.body.username}, function(err, result) {
+	      console.log('user deleted');
+	      db.close();
+    	});
+	});
+
+});
+app.post('/insertCurrentUser', function(req, res, next) {
+	var item={
+		_id : req.body.username,
+		username : req.body.username
+	}
+
+	MongoClient.connect(url, function(err, db) {
+	    db.collection('currentUsers').insert(item, function(err, result) {
+	      console.log('user inserted');
+	      db.close();
+    	});
+	});
+
+});
 app.post('/update', function(req, res, next) {
 
 	var item={
@@ -89,9 +167,7 @@ app.post('/update', function(req, res, next) {
 	};
 
   	MongoClient.connect(url, function(err, db) {
-	    //assert.equal(null, err);
 	    db.collection('appusers').update({'username': req.body.user}, {$set: item}, function(err, result) {
-	      //assert.equal(null, err);
 	      console.log('Item updated');
 	      db.close();
     	});
@@ -100,7 +176,6 @@ app.post('/update', function(req, res, next) {
 });
 // list all the users in appusers
 app.get('/listUsers', function(req,res){
-	console.log('yaaaa');
 	
 	MongoClient.connect(url, function(err,db){
 		db.collection('appusers').find({}).toArray(function (err, docs) {

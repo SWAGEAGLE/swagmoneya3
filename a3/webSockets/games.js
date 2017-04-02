@@ -419,7 +419,7 @@ Stage.prototype.keysaction=function (e,player) {
 
 /********************************GAME SERVER*********************************************************************************/
 var WebSocketServer = require('ws').Server;
-var server = new WebSocketServer({port: 10436});
+var server = new WebSocketServer({port: 10431});
 var gameworld = new GameWorld();
 /*
 gameworld.server.on('close', function() {
@@ -427,14 +427,12 @@ gameworld.server.on('close', function() {
 });
 */
 server.on('connection', function(ws){
-    console.log('new player request');
     var user;
     ws.on('message',function(message){
         //console.log('did we make it');
         var parsed = JSON.parse(message);
         //console.log(message);
         if(parsed.new != null){
-            console.log("in parsed: "+parsed.username);
             gameworld.stage.addPlayer(parsed.username);
             user=parsed.username;
             ws.send(JSON.stringify({actors: gameworld.stage.actors, players: gameworld.stage.players}));
@@ -461,6 +459,7 @@ server.on('connection', function(ws){
 
         }
         console.log('disconnected');
+        server.broadcast(JSON.stringify({user:user}));
     })
     
 });

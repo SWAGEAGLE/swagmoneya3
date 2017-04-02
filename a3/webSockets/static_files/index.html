@@ -44,7 +44,7 @@
             $(function(){
                 //setupGame();
                 //startGame();
-                //setScores();
+                setScores();
                 toggleLogin(setupGame,startGame);
             });
 
@@ -216,6 +216,11 @@
                 #game button{
                     margin: 5px;
                 }
+                .boxed {
+                    width:200px;
+                    height:500px;
+                  background-color:lightblue;
+                }
             </style>
             <body bgcolor="ffffff">
                 <div style="position: absolute; left: 25px; top: 75px; width: 20%;">
@@ -229,9 +234,9 @@
                     <input type="text" id ="chal" placeholder="Username" name="chal" /> 
                     <button type="submit" id='sendChal' name="sendChal">Challenge</button>
                 </div>
-                <div id="rightSide" class="rightSide" style="position: absolute; right: 10px; top: 80px; width: 20%;">
-                    <b><label id="score"></label><b>
-                    <h2><label id="req">Requests:</label></h2>
+                <div id="rightSide" class="boxed" style="position: absolute; right: 10px; top: 80px; width: 20%; background-color:lightblue;">
+                   
+                    <h2><label id="gameUsers">&nbsp;<u>Users:<u></label></h2>
 
                 </div>
                 <center>
@@ -243,6 +248,7 @@
                                 <center>
                                     <h2>Legend</h2>
                                     <table class="legend">
+
                                         <tr>
                                             <td> <img src="icons/blank.gif" id="blankImage" /> </td>
                                             <td> <img src="icons/emblem-package-2-24.png" id="boxImage" /> </td>
@@ -276,6 +282,7 @@
                                             <td><img src="icons/south_east.svg" onclick = "move.movement('SE')" /></td>
                                         </tr>
                                     </table>
+                                    <b><label id="score"></label><b>
                                 </center>
                             </td>
                         </tr>
