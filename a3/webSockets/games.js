@@ -428,6 +428,7 @@ gameworld.server.on('close', function() {
 */
 server.on('connection', function(ws){
     var user;
+    var users=[];
     ws.on('message',function(message){
         //console.log('did we make it');
         var parsed = JSON.parse(message);
@@ -435,13 +436,17 @@ server.on('connection', function(ws){
         if(parsed.new != null){
             gameworld.stage.addPlayer(parsed.username);
             user=parsed.username;
-            ws.send(JSON.stringify({actors: gameworld.stage.actors, players: gameworld.stage.players}));
+            users.push(user);
+            ws.send(JSON.stringify({actors: gameworld.stage.actors, players: gameworld.stage.players, users: currentUsers}));
             //console.log('game data sent');
         }else if(parsed.move != null){
 
             //console.log(gameworld.stage.players[parsed.username]);
             gameworld.stage.playeraction(gameworld.stage.players[parsed.username],parsed.move);
             ws.send(JSON.stringify({actors: gameworld.stage.actors}));
+        }
+        else if(currentUsers != null){
+            users=currentUsers;
         }
     })
 
@@ -459,7 +464,7 @@ server.on('connection', function(ws){
 
         }
         console.log('disconnected');
-        server.broadcast(JSON.stringify({user:user}));
+
     })
     
 });

@@ -26,10 +26,8 @@ app.get('/new', function(req,res){
 	MongoClient.connect(url, function(err,db){
 		db.collection('appusers').remove({});
 		db.collection('scores').remove({});
-		db.collection('currentUsers').remove({});
 		db.createCollection('appusers');
 		db.createCollection('scores');
-		db.createCollection('currentUsers');
 	})
 
 	res.end('ok');
@@ -115,7 +113,7 @@ app.post('/insert', function(req, res, next) {
   	});
 
 });
-
+/*
 app.get('/currentUsers',function(req,res){
 
 	MongoClient.connect(url, function(err,db){
@@ -159,6 +157,7 @@ app.post('/insertCurrentUser', function(req, res, next) {
 	});
 
 });
+*/
 app.post('/update', function(req, res, next) {
 
 	var item={

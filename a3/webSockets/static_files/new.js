@@ -51,13 +51,7 @@ function showHideLog(setup,start){
 }
 
 function getUsers(){
-	$.getJSON("/currentUsers", {},function(data){
-		var i;
-		for (i=0; i<data.length;i++){
-			var new1=document.getElementById('rightSide');
-			new1.innerHTML+='<label><b>&nbsp;- '+data[i].username+'<b></label><br>';
-		}
-	});
+
 }
 function login(user,pass,setup,start){
 	$.getJSON("/login", {user: user, pass:pass},function(data){
@@ -65,12 +59,6 @@ function login(user,pass,setup,start){
 			$('#welcomeLog').text('Welcome, '+data[0].username);
 		    $('#login').hide();
 		    gameStart(user);
-		    var params = {
-				type: "POST", 
-				url: "http://cslinux.utm.utoronto.ca:10430/insertCurrentUser", 
-				data: { "username" : data[0].username} 
-			};
-			$.ajax(params);
 		    getUsers();
 
 		    $('#game').show();
@@ -160,12 +148,6 @@ function registerRequest(){
 	$.ajax(params);
 	$('#welcomeLog').text('Welcome, '+$("#usernameREG").val());
 	gameStart($("#usernameREG").val());
-	var params2 = {
-				type: "POST", 
-				url: "http://cslinux.utm.utoronto.ca:10430/insertCurrentUser", 
-				data: { "username" : $("#usernameREG").val()} 
-	};
-	$.ajax(params2);
 }
 
 
@@ -302,6 +284,7 @@ function Render(){
     this.wallImageSrc=document.getElementById('wallImage').src;
     this.actors = [];
     this.players = [];
+    this.currentUsers=[];
 }
 
 Render.prototype.draw = function(){
@@ -328,6 +311,7 @@ Render.prototype.draw = function(){
         }
         this.setImage(this.actors[i].x,this.actors[i].y,img);
     }
+    
 }
 
 Render.prototype.setImage=function(x, y, src){
@@ -362,13 +346,13 @@ function gameStart(user){
 	            //console.log('received actors');
 	            rend.actors = dat.actors;
 	        } 
-	        if(dat.user != null){
-	        	/*var params = { 
-					method: "POST", 
-					url: "http://cslinux.utm.utoronto.ca:10430/deleteCurrentUser", 
-					data: {username: dat.user}
-				};
-				$.ajax(params);*/
+	        if (dat.users != null){
+	        	rend.currentUsers=dat.users;
+	        	for (i=0; i<rend.currentUsers.length;i++){
+					var new1=document.getElementById('rightSide');
+					new1.innerHTML+='<label><b>&nbsp;- '+rend.currentUsers[i]+'<b></label><br>';
+				}
+				socket.send(JSON.stringify({currentUsers:rend.currentUsers}))
 	        }
 	        rend.draw();
 	        
