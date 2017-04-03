@@ -331,7 +331,7 @@ function gameStart(user){
 
 	/*****CLIENT SOCKET CODE******/
 	$(document).ready(function(){
-	    window.socket = new WebSocket("ws://cslinux.utm.utoronto.ca:10431");
+	    window.socket = new WebSocket("ws://cslinux.utm.utoronto.ca:10432");
 	    if (newS){
 	    	setUp(20,20);
 	    }
@@ -357,6 +357,9 @@ function gameStart(user){
 	        rend.draw();
 	        
 	    }
+	   document.onkeydown = function(e){
+	   		socket.send(JSON.stringify({username: user, event:e.keyCode}));
+	   }
 	});
 }
 
@@ -391,6 +394,7 @@ function setScores(){
 		}
     })
 }
+
 
 /*
 function challenge(user){
