@@ -1,0 +1,62 @@
+/* style parts of the legend, the controls and the elements in the stage appropriately */
+                .table {
+                    border: 1px solid black;
+                    table-layout: fixed;
+                    width: 200px;
+                    padding:0; 
+                    margin:0;
+                    border-collapse: collapse
+
+
+                }
+
+                .game {
+                    width:20px; 
+                    height:20px;
+                    max-width:5px;
+                    max-height:5px; 
+                    padding:0; 
+                    margin:0;
+                    text-align: center;
+                    border: 1px solid black;
+                    margin-left: auto;
+                    margin-right: auto;
+                    border-collapse: collapse;
+                    **overflow:hidden;** /*(Optional)This might be useful for some overflow contents*/   
+                }
+                .autosize {
+                    max-width: 100%;
+                    height: auto;
+                    width: auto;
+                }
+                button.profile {
+                    top : 25px;
+                    position: relative;;
+                }
+                #game button{
+                    margin: 5px;
+                }
+                .boxed {
+                    width:200px;
+                    height:500px;
+                  background-color:lightblue;
+                }
+                table, td, th {
+                    border: 1px solid black;
+                }
+
+                table.inscores {
+                    border-collapse: collapse;
+                    width: 70%;
+                    margin-top:50px;
+                    margin-left:0px;
+                }
+
+                table.inscores th {
+                    background-color: lightblue;
+                    height: 50px;
+                }
+                
+                table.inscores td {
+                    text-align:center; 
+                }

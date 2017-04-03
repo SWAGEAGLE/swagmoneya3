@@ -9,103 +9,17 @@
         <script>var move = new move();</script>
 
         <script> 
-
-            stage=null;
-            // SOME GLUE CODE CONNECTING THIS PAGE TO THE STAGE
-            interval=null;
-            function setupGame(go){
-                stage=new Stage(20,20,"stage");
-                stage.initialize();
-            }
-            function startGame(){
-                // YOUR CODE GOES HERE
-                var startime = new Date();
-                document.onkeydown = function(e){
-                    stage.keysaction(e);
-                }
-                var interval = setInterval(function(){
-                    var keepgoing = stage.step();
-                    display(startime);
-                    if(!keepgoing){
-                        setScore();
-                        clearInterval(interval);
-                        document.onkeydown = function(e){}
-                        clearInterval(display(startime)); 
-                    }
-
-                },2000);
-                
-            }
-            function pauseGame(){
-                // YOUR CODE GOES HERE
-            }
-            // YOUR CODE GOES HERE
-
             $(function(){
-                //setupGame();
-                //startGame();
                 setScores();
-                toggleLogin(setupGame,startGame);
+                toggleLogin();
             });
-
-
         </script>
     </head>
   
     <body>
-        <style>
-            body{
-                background-color:beige;
-                font-family: Arial;
-            }
-            form {
-                background-color: #FFDEAD;
-                width:25%;
-                border: 3px solid #f1f1f1;
-                border-left: 2px;
-            }
-
-            input[type=text], input[type=password] {
-                width: 70%;
-                padding: 12px 20px;
-                margin: 8px 0;
-                display: inline-block;
-                border: 1px solid #ccc;
-                box-sizing: border-box;
-            }
-
-            button {
-                background-color: lightblue;
-                padding: 14px 20px;
-                margin: 8px 0;
-                border: none;
-                cursor: pointer;
-                width: 45%;
-            }
-
-            table, td, th {
-                border: 1px solid black;
-            }
-
-            table.highscores {
-                border-collapse: collapse;
-                width: 50%;
-                margin-top:-210px;
-                margin-left:400px;
-            }
-
-            table.highscores th {
-                background-color: lightblue;
-                height: 50px;
-            }
-            
-            table.highscores td {
-                text-align:center; 
-            }
-
-        </style>
         <!-- Login form-->
-        <div name="login" id="login" style="display:">
+        <div name="login" id="login">
+            <link rel="stylesheet" href="login.css">
             <h2>Login Form</h2>
             <form method="post" name="logForm">
                 <label><b>Username</b></label>
@@ -221,6 +135,25 @@
                     height:500px;
                   background-color:lightblue;
                 }
+                table, td, th {
+                    border: 1px solid black;
+                }
+
+                table.inscores {
+                    border-collapse: collapse;
+                    width: 70%;
+                    margin-top:50px;
+                    margin-left:0px;
+                }
+
+                table.inscores th {
+                    background-color: lightblue;
+                    height: 50px;
+                }
+                
+                table.inscores td {
+                    text-align:center; 
+                }
             </style>
             <body bgcolor="ffffff">
                 <div style="position: absolute; left: 25px; top: 75px; width: 20%;">
@@ -229,14 +162,17 @@
                     <br>
                     <button type="submit" id='logout' name="submit">Logout</button>
                     <br></br>
-                    <h2><label id="cha">Challenge:</label></h2>
-                    <label><b>Enter Username to Challenge:</b></label>
-                    <input type="text" id ="chal" placeholder="Username" name="chal" /> 
-                    <button type="submit" id='sendChal' name="sendChal">Challenge</button>
+                    <table id="inscores" class="inscores">
+                        <tr>
+                                <th>Username</th>
+                                <th>Score</th>
+                        </tr>
+                    </table>
                 </div>
                 <div id="rightSide" class="boxed" style="position: absolute; right: 10px; top: 80px; width: 20%; background-color:lightblue;">
                    
-                    <h2><label id="gameUsers">&nbsp;<u>Users:<u></label></h2>
+                    <h2><label id="gameUsers">&nbsp;Users:</label></h2>
+                    <div id="under"></div>
 
                 </div>
                 <center>

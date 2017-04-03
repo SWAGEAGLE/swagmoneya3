@@ -1,0 +1,48 @@
+            body{
+                background-color:beige;
+                font-family: Arial;
+            }
+            form {
+                background-color: #FFDEAD;
+                width:25%;
+                border: 3px solid #f1f1f1;
+                border-left: 2px;
+            }
+
+            input[type=text], input[type=password] {
+                width: 70%;
+                padding: 12px 20px;
+                margin: 8px 0;
+                display: inline-block;
+                border: 1px solid #ccc;
+                box-sizing: border-box;
+            }
+
+            button {
+                background-color: lightblue;
+                padding: 14px 20px;
+                margin: 8px 0;
+                border: none;
+                cursor: pointer;
+                width: 45%;
+            }
+
+            table, td, th {
+                border: 1px solid black;
+            }
+
+            table.highscores {
+                border-collapse: collapse;
+                width: 50%;
+                margin-top:-210px;
+                margin-left:400px;
+            }
+
+            table.highscores th {
+                background-color: lightblue;
+                height: 50px;
+            }
+            
+            table.highscores td {
+                text-align:center; 
+            }

@@ -1,5 +1,5 @@
 window.newS=true;
-function toggleLogin(setup,start){
+function toggleLogin(){
 	$(document).ready(
     	$('#log').click(function(e){
             if (logValidate() != false){
@@ -7,8 +7,8 @@ function toggleLogin(setup,start){
 	        	username = $('#uname').val();
 	        	pass = $('#psw').val();
 	        	score();
-	        	profile(username,pass,setup,start);
-	        	login(username,pass,setup,start);
+	        	profile(username,pass);
+	        	login(username,pass);
 	        	logout();
 	        	
 			}
@@ -44,7 +44,7 @@ function showHideLog(setup,start){
 	        	registerRequest(); 
 	            $('#register').hide()
 	            $('#game').show();
-	            profile($('#usernameREG').val(),$('#passwdREG').val(),setup,start);
+	            profile($('#usernameREG').val(),$('#passwdREG').val());
 	            getUsers();
 	        }
     }))
@@ -53,7 +53,7 @@ function showHideLog(setup,start){
 function getUsers(){
 
 }
-function login(user,pass,setup,start){
+function login(user,pass){
 	$.getJSON("/login", {user: user, pass:pass},function(data){
 		try{
 			$('#welcomeLog').text('Welcome, '+data[0].username);
@@ -151,7 +151,7 @@ function registerRequest(){
 }
 
 
-function profile(user,pass,setup,start){
+function profile(user,pass){
 	$(document).ready(
     	$('#profile').click(function(e){
         	e.preventDefault();
@@ -225,7 +225,7 @@ function setScore(){
 }
 
 
-function profUpdate(user,oldpasswd,newpasswd,email,setup,start){
+function profUpdate(user,oldpasswd,newpasswd,email){
 	var ret;
 	$.getJSON("/login", {user: user, pass:oldpasswd},function(data){
 		console.log(data[0]);
@@ -242,7 +242,7 @@ function profUpdate(user,oldpasswd,newpasswd,email,setup,start){
 			};
 			ret=true;
 			$.ajax(params);
-			profile(username,newpasswd,setup,start);
+			profile(username,newpasswd);
 		    $('#prof').hide();
         	$('#game').show();
 		}
@@ -285,6 +285,7 @@ function Render(){
     this.actors = [];
     this.players = [];
     this.currentUsers=[];
+    this.userPts=[];
 }
 
 Render.prototype.draw = function(){
@@ -311,6 +312,22 @@ Render.prototype.draw = function(){
         }
         this.setImage(this.actors[i].x,this.actors[i].y,img);
     }
+    document.getElementById('under').innerHTML = "";
+    document.getElementById('userPts').innerHTML = "";
+
+    for (i=0; i<this.currentUsers.length;i++){
+		var new1=document.getElementById('under');
+		new1.innerHTML+='<label><b>&nbsp;- '+this.currentUsers[i]+'<b></label><br>';
+	}
+	var table = document.getElementById("inscores");
+	for (var key in this.ptsUser){
+		//console.log("element: "+data[i].username);
+	    var row = table.insertRow(i+1);
+	    var cell1 = row.insertCell(0);
+	    var cell2 = row.insertCell(1);
+	    cell1.innerHTML = key;
+	    cell2.innerHTML = this.ptsUser[key];
+	}
     
 }
 
@@ -343,20 +360,31 @@ function gameStart(user){
 	    socket.onmessage = function(event){
 	        var dat = JSON.parse(event.data);
 	        if(dat.actors != null){
-	            //console.log('received actors');
 	            rend.actors = dat.actors;
 	        } 
 	        if (dat.users != null){
 	        	rend.currentUsers=dat.users;
-	        	for (i=0; i<rend.currentUsers.length;i++){
-					var new1=document.getElementById('rightSide');
-					new1.innerHTML+='<label><b>&nbsp;- '+rend.currentUsers[i]+'<b></label><br>';
-				}
-				socket.send(JSON.stringify({currentUsers:rend.currentUsers}))
+	        }
+	        if (dat.pts != null){
+	        	rend.userPts=dat.pts;
+	        	/*var table = document.getElementById("inscores");
+				var i;
+				for (var key in dat.pts){
+					//console.log("element: "+data[i].username);
+				    var row = table.insertRow(i+1);
+				    var cell1 = row.insertCell(0);
+				    var cell2 = row.insertCell(1);
+				    cell1.innerHTML = key;
+				    cell2.innerHTML = dat.pts[key];
+				}*/
+
 	        }
 	        rend.draw();
 	        
 	    }
+	    document.onkeydown = function(e){
+	   		socket.send(JSON.stringify({username: user, event:e.keyCode}));
+	   }
 	});
 }
 
@@ -370,6 +398,7 @@ function logout(){
         	document.getElementById('uname').value='';
 			document.getElementById('psw').value='';
 			window.newS=false;
+			window.socket.close();
         }))
 }
 
@@ -378,11 +407,8 @@ function setScores(){
 	$.getJSON("/highscores", {},
 	function(data){
 		var table = document.getElementById("highscores");
-		console.log(data);
-		console.log(Object.keys(data).length);
 		var i;
 		for (i=0; i<data.length;i++){
-			console.log("element: "+data[i].username);
 		    var row = table.insertRow(i+1);
 		    var cell1 = row.insertCell(0);
 		    var cell2 = row.insertCell(1);
@@ -392,42 +418,3 @@ function setScores(){
     })
 }
 
-/*
-function challenge(user){
-	$(document).ready(
-    	$('#sendChal').click(function(e){
-    		e.preventDefault();
-    		//var dataobj={challenger: user, opponent: $("#chal").val()};
-    		var params = { 
-					method: "PUT", 
-					url: "api/api.php", 
-					data: {challenger: user, opponent: $("#chal").val()}
-				};
-
-			$.ajax(params).done(alert("hi"));
-    	}))
-}
-
-function requests(user){
-	$.getJSON("api/api.php", {user: user},
-		function(data){
-			var i;
-			for (i=0; i<data.length;i++){
-				var new1=document.getElementById('rightSide');
-				new1.innerHTML+='<label>USERNAME: '+data[i][0]+" SCORE:"+data[i][1]+'</label><br>';
-				new1.innerHTML+='<button type="submit" id="'+data[i][0]+i+'">Accept</button>';
-				new1.innerHTML+='<button type="submit" id="decline">Decline</button>';
-			}	
-		})
-}
-
-function logout(){
-	$(document).ready(
-    	$('#logout').click(function(e){
-        	e.preventDefault();
-        	$('#game').hide();
-        	$('#login').show();
-        	document.getElementById('uname').value='';
-			document.getElementById('psw').value='';
-        }))
-}*/

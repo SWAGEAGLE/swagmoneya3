@@ -19,6 +19,132 @@ function Player(username,name,x,y){
     this.username = username;
 
 }
+
+//*********************MONSTER CLASS ************************
+
+function Monster(name,x,y){
+    Actor.call(this,name,x,y);
+}
+
+Monster.prototype.move = function(stage){
+    let canstill = ['N','W','E','S','NE','NW','SE','SW'];
+    let movement;
+    while(true){
+        if(canstill.length == 0){
+            stage.removeActor(this);
+            pts[user]=pts[user]+1;
+            break;
+        }
+        let move = Math.floor((Math.random() * canstill.length));
+        let direction = canstill[move];
+        let flag = false;
+        switch(direction){
+            case 'N':
+                if((movement = stage.monstermove(this,1,0)) == true){
+                    flag = true;
+                    break;
+                }
+                if((movement == "GAME OVER")){
+                    return false;
+                }
+                else{
+                    canstill.splice(move,1);
+                    break
+                }
+
+                case 'E':
+                    if((movement = stage.monstermove(this,0,1)) == true){
+                        flag = true;
+                        break;
+                    }
+                    if((movement == "GAME OVER")){
+                        return false;
+                    }
+                    else{
+                        canstill.splice(move,1);
+                        break;
+                    }
+                case 'S':
+                    if((movement = stage.monstermove(this,-1,0)) == true){
+                        flag = true;
+                        break;
+                    }
+                    if((movement == "GAME OVER")){
+                        return false;
+                    }
+                    else{
+                        canstill.splice(move,1);
+                        break;
+                    }
+                case 'W':
+                    if((movement = stage.monstermove(this,0,-1)) == true){
+                        flag = true;
+                        break;
+                    }
+                    if((movement == "GAME OVER")){
+                        return false;
+                    }
+                    else{
+                        canstill.splice(move,1);
+                        break;
+                    }
+                case 'NE':
+                    if((movement = stage.monstermove(this,1,1)) == true){
+                        flag = true;
+                        break;
+                    }
+                    if((movement == "GAME OVER")){
+                        return false;
+                    }
+                    else{
+                        canstill.splice(move,1);
+                        break;
+                    }
+                case 'NW':
+                    if((movement = stage.monstermove(this,1,-1)) == true){
+                         flag = true;
+                         break;
+                    }
+                    if((movement == "GAME OVER")){
+                        return false;
+                    }
+                    else{
+                        canstill.splice(move,1);
+                        break;
+                    }
+                case 'SE':
+                    if((movement = stage.monstermove(this,-1,1)) == true){
+                         flag = true;
+                        break;
+                    }
+                    if((movement == "GAME OVER")){
+                        return false;
+                    }
+                    else{
+                        canstill.splice(move,1);
+                        break;
+                    }
+                case 'SW':
+                    if((movement = stage.monstermove(this,-1,-1)) == true){
+                        flag = true;
+                        break;
+                    }
+                    if((movement == "GAME OVER")){
+                        return false;
+                    }
+                    else{
+                        canstill.splice(move,1);
+                        break;
+                    }
+                }
+        if(flag)
+            break;
+
+    }
+    return true;
+}
+//*************************** MONSTER CLASS END
+
 //game world class
 function GameWorld(){
     this.stage = new Stage(20,20) 
@@ -71,7 +197,7 @@ Stage.prototype.initialize=function(){
         for (var j = 2 ; j < this.height; j++){
             if(j % 7 == 0 && i % 6 == 0){
                 var m = 
-                    new Actor('monster',i,j);
+                    new Monster('monster',i,j);
                     
                 this.addActor(m);
             }
@@ -80,7 +206,7 @@ Stage.prototype.initialize=function(){
     //FIRST SET OF BOXES
     for (var i = 2; i < this.width ; i++){
             for (var j = 2 ; j < this.height; j++){
-                if(j % 2== 0&& (i < 7 || i> 15) && this.getActor(i,j) == null) {
+                if(j % 2== 0&& (i < 20 || i> 15) && this.getActor(i,j) == null) {
                     var m = 
                         new Actor('box',i,j);
                     this.addActor(m);
@@ -109,9 +235,7 @@ Stage.prototype.addPlayer = function(username){
                 
     }  
     var player = new Player(username,'player',x,y);
-    console.log(username);
     this.players[username] = player;
-    console.log(this.players[username]);
     this.actors.push(player);
 }
 
@@ -128,135 +252,26 @@ Stage.prototype.setImage=function(x, y, src){
 Stage.prototype.randNum=function(){
     return Math.floor(Math.random() * (5 - 1) + 1);
 }
+
 // Take one step in the animation of the game.  
 Stage.prototype.step=function(){
     //MONSTERS MOVE AT RANDOM AND AROUND BOXES
     //number of monsters, check to see if you killed all of them
     let monstercounter = 0;
+    let flag=true;
     for(var i=0;i<this.actors.length;i++){
         var actor = this.actors[i];
         if(actor.name ==  "monster"){
             monstercounter++;
-            let canstill = ['N','W','E','S','NE','NW','SE','SW'];
-            let movement;
-            while(true){
-                if(canstill.length == 0){
-                    this.removeActor(actor);
-                    break;
-                }
-                let move = Math.floor((Math.random() * canstill.length));
-                let direction = canstill[move];
-                let flag = false;
-                switch(direction){
-                    case 'N':
-                         if((movement = this.monstermove(actor,1,0)) == true){
-                            flag = true;
-                            break;
-                         }
-                         if((movement == "GAME OVER")){
-                            return false;
-                         }
-                         else{
-                            canstill.splice(move,1);
-                            break
-                         }
-
-                    case 'E':
-                        if((movement = this.monstermove(actor,0,1)) == true){
-                            flag = true;
-                            break;
-                        }
-                         if((movement == "GAME OVER")){
-                            return false;
-                        }
-                         else{
-                            canstill.splice(move,1);
-                            break;
-                         }
-
-                    case 'S':
-                        if((movement = this.monstermove(actor,-1,0)) == true){
-                            flag = true;
-                            break;
-                        }
-                         if((movement == "GAME OVER")){
-                            return false;
-                        }
-                         else{
-                            canstill.splice(move,1);
-                            break;
-                         }
-                    case 'W':
-                        if((movement = this.monstermove(actor,0,-1)) == true){
-                            flag = true;
-                            break;
-                        }
-                         if((movement == "GAME OVER")){
-                            return false;
-                        }
-                         else{
-                            canstill.splice(move,1);
-                            break;
-                         }
-                    case 'NE':
-                        if((movement = this.monstermove(actor,1,1)) == true){
-                            flag = true;
-                            break;
-                         }
-                         if((movement == "GAME OVER")){
-                            return false;
-                         }
-                         else{
-                            canstill.splice(move,1);
-                            break;
-                         }
-                    case 'NW':
-                        if((movement = this.monstermove(actor,1,-1)) == true){
-                            flag = true;
-                            break;
-                         }
-                         if((movement == "GAME OVER")){
-                            return false;
-                         }
-                         else{
-                            canstill.splice(move,1);
-                            break;
-                         }
-                    case 'SE':
-                        if((movement = this.monstermove(actor,-1,1)) == true){
-                            flag = true;
-                            break;
-                         }
-                         if((movement == "GAME OVER")){
-                            return false;
-                         }
-                         else{
-                            canstill.splice(move,1);
-                            break;
-                         }
-                    case 'SW':
-                        if((movement = this.monstermove(actor,-1,-1)) == true){
-                            flag = true;
-                            break;
-                        }
-                         if((movement == "GAME OVER")){
-                            return false;
-                         }
-                         else{
-                            canstill.splice(move,1);
-                            break;
-                         }
-                }
-                if(flag)
-                    break;
-
-
+            if (!actor.move(this)){
+                flag=false;
             }
+
         }
     }
     if(monstercounter == 0)
         return false;
-    return true;
+    return flag;
     
 }
 
@@ -384,16 +399,15 @@ Stage.prototype.playeraction = function(player,direction){
 
 //not working (keyboard navigation..trying to implement so that we don't have repeating code)
 Stage.prototype.keysaction=function (e,player) {
-    e = e || window.event;
-    switch(e.keyCode){
+    switch(e){
         case 68:
-            this.playeraction(player,'W');
+            this.playeraction(player,'E');
             break;
         case 87:
             this.playeraction(player,'N');
             break;
         case 65:
-            this.playeraction(player,'E');
+            this.playeraction(player,'W');
             break;
         case 88:
             this.playeraction(player,'S');
@@ -421,48 +435,60 @@ Stage.prototype.keysaction=function (e,player) {
 var WebSocketServer = require('ws').Server;
 var server = new WebSocketServer({port: 10431});
 var gameworld = new GameWorld();
-/*
-gameworld.server.on('close', function() {
-    console.log('disconnected');
-});
-*/
+
+var users=[];
+var user;
+var pts = {};
+
 server.on('connection', function(ws){
-    var user;
-    var users=[];
+    
+
     ws.on('message',function(message){
-        //console.log('did we make it');
         var parsed = JSON.parse(message);
-        //console.log(message);
         if(parsed.new != null){
             gameworld.stage.addPlayer(parsed.username);
             user=parsed.username;
             users.push(user);
-            ws.send(JSON.stringify({actors: gameworld.stage.actors, players: gameworld.stage.players, users: currentUsers}));
-            //console.log('game data sent');
-        }else if(parsed.move != null){
 
-            //console.log(gameworld.stage.players[parsed.username]);
+            server.broadcast(JSON.stringify({actors: gameworld.stage.actors, players: gameworld.stage.players,users: users}));
+        }else if(parsed.move != null){
             gameworld.stage.playeraction(gameworld.stage.players[parsed.username],parsed.move);
             ws.send(JSON.stringify({actors: gameworld.stage.actors}));
-        }
-        else if(currentUsers != null){
-            users=currentUsers;
+        }else if(parsed.event != null){
+            gameworld.stage.keysaction(parsed.event, gameworld.stage.players[parsed.username]);
         }
     })
 
     setInterval(function(){
-        gameworld.stage.step();
-        //ws.send(JSON.stringify({actors: gameworld.stage.actors, players: gameworld.stage.players}))
+        var ret = gameworld.stage.step();
+        if (!ret){
+            for (var i = 0; i < gameworld.stage.actors.length ; i++){
+                if (gameworld.stage.actors[i].username==user){
+                    gameworld.stage.actors.splice(i,1);                
+                }
+            }
+            var index = users.indexOf(user);
+            if (index>=0){
+                users.splice(index,1);
+            }
+            server.broadcast(JSON.stringify({actors: gameworld.stage.actors, players: gameworld.stage.players,users: users, pts:pts}));
+            console.log('disconnected');
+        }
         server.broadcast(JSON.stringify({actors: gameworld.stage.actors, players: gameworld.stage.players}));
     },2000)
 
     ws.on('close', function (event) {
         for (var i = 0; i < gameworld.stage.actors.length ; i++){
             if (gameworld.stage.actors[i].username==user){
-                gameworld.stage.actors.splice(i,1);
+                gameworld.stage.actors.splice(i,1);                
             }
 
         }
+        var index = users.indexOf(user);
+        if (index>=0){
+            users.splice(index,1);
+        }
+        server.broadcast(JSON.stringify({actors: gameworld.stage.actors, players: gameworld.stage.players,users: users}));
         console.log('disconnected');
 
     })
@@ -473,8 +499,5 @@ server.broadcast = function(message){
     for(let ws of this.clients){ 
         ws.send(message); 
     }
-
-    // Alternatively
-    // this.clients.forEach(function (ws){ ws.send(message); });
 }
 
